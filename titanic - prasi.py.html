@@ -1,0 +1,237 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[175]:
+
+
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+get_ipython().run_line_magic('matplotlib', 'inline')
+df=pd.read_csv('train.csv')
+
+
+# In[176]:
+
+
+df.head()
+
+
+# In[180]:
+
+
+df.info()
+
+
+# In[181]:
+
+
+df=df.drop(columns='Cabin')
+
+
+# In[182]:
+
+
+df.head()
+
+
+# In[183]:
+
+
+df.describe()
+
+
+# In[184]:
+
+
+df.isnull()
+
+
+# In[185]:
+
+
+sns.heatmap(df.isnull(), yticklabels=False, cbar=True, cmap='plasma')
+
+
+# In[186]:
+
+
+sns.set_style('whitegrid')
+sns.countplot(x='Survived', hue='Sex', data=df)
+
+
+# In[187]:
+
+
+sns.countplot(x="Survived", hue="Pclass", data=df)
+
+
+# In[188]:
+
+
+sns.distplot(df['Age'].dropna(), kde=True, bins=30)
+
+
+# In[189]:
+
+
+sns.distplot(df['Survived'])
+
+
+# In[190]:
+
+
+sns.boxplot(x='Pclass', y='Age', data=df)
+
+
+# In[191]:
+
+
+def AgeSubs(cols):
+    Age = cols[0]
+    Pclass = cols [1]
+    
+    if pd.isnull(Age):
+        if Pclass == 1:
+            return 37
+        elif Pclass == 2:
+            return 29
+        else:
+            return 24
+    else:
+        return Age
+
+
+# In[192]:
+
+
+df['Age']=df[['Age','Pclass']].apply(AgeSubs,axis=1)
+
+
+# In[193]:
+
+
+sns.heatmap(df.isnull(), yticklabels=False, cmap='plasma')
+
+
+# In[194]:
+
+
+df.tail()
+
+
+# In[195]:
+
+
+df.dropna(inplace=True)
+
+
+# In[196]:
+
+
+Sex=pd.get_dummies(df['Sex'],drop_first=True)
+
+
+# In[197]:
+
+
+Embarked=pd.get_dummies(df['Embarked'],drop_first=True)
+
+
+# In[198]:
+
+
+df=pd.concat([df,Sex,Embarked],axis=1)
+
+
+# In[199]:
+
+
+df.head()
+
+
+# In[200]:
+
+
+df.drop(['Sex','Name','Embarked','Ticket'], axis = 1 ,inplace=True)
+
+
+# In[201]:
+
+
+df.head()
+
+
+# In[202]:
+
+
+X=df.drop('Survived', axis=1)
+y=df['Survived']
+
+
+# In[203]:
+
+
+from sklearn.model_selection import train_test_split
+
+
+# In[204]:
+
+
+X_train,X_test,y_train,y_test=train_test_split(X,y,test_size=0.3,random_state=101)
+
+
+# In[205]:
+
+
+from sklearn.linear_model import LogisticRegression
+
+
+# In[207]:
+
+
+logreg = LogisticRegression()
+
+
+# In[208]:
+
+
+logreg.fit(X_train,y_train)
+
+
+# In[209]:
+
+
+predictions=logreg.predict(X_test)
+
+
+# In[211]:
+
+
+from sklearn.metrics import classification_report
+
+
+# In[212]:
+
+
+print(classification_report(y_test,predictions))
+
+
+# In[215]:
+
+
+from sklearn.metrics import confusion_matrix
+
+
+# In[217]:
+
+
+confusion_matrix(y_test,predictions)
+
+
+# In[ ]:
+
+
+
+
